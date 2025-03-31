@@ -1,0 +1,85 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if form.instance.device_id %}
+                        Edit Device: {{ form.instance.device_id }}
+                    {% else %}
+                        Add New Device
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.device_id.id_for_label }}" class="form-label">Device ID</label>
+                        <input type="text" class="form-control {% if form.device_id.errors %}is-invalid{% endif %}" 
+                               id="{{ form.device_id.id_for_label }}" 
+                               name="{{ form.device_id.html_name }}" 
+                               value="{{ form.device_id.value|default:'' }}" 
+                               {% if form.instance.device_id %}readonly{% endif %}>
+                        {% if form.device_id.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.device_id.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.device_type.id_for_label }}" class="form-label">Device Type</label>
+                        <input type="text" class="form-control {% if form.device_type.errors %}is-invalid{% endif %}" 
+                               id="{{ form.device_type.id_for_label }}" 
+                               name="{{ form.device_type.html_name }}" 
+                               value="{{ form.device_type.value|default:'' }}"
+                               placeholder="e.g., S for Sensor, W for Windows system, etc.">
+                        {% if form.device_type.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.device_type.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Choose a type identifier (e.g., S for sensor, W for Windows system)
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.installation_date.id_for_label }}" class="form-label">Installation Date</label>
+                        {{ form.installation_date }}
+                        {% if form.installation_date.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.installation_date.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" 
+                               id="{{ form.location.id_for_label }}" 
+                               name="{{ form.location.html_name }}" 
+                               value="{{ form.location.value|default:'' }}">
+                        {% if form.location.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.location.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'device-list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.device_id %}Update{% else %}Create{% endif %} Device
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

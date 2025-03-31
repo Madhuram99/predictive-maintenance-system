@@ -1,0 +1,26 @@
+/* Add any custom styles here */
+.device-health {
+    height: 20px;
+    border-radius: 3px;
+}
+
+.health-good {
+    background-color: #28a745;
+}
+
+.health-warning {
+    background-color: #ffc107;
+}
+
+.health-critical {
+    background-color: #dc3545;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}

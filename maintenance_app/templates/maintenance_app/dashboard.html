@@ -1,0 +1,384 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Predictive Maintenance Dashboard</h1>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Total Devices</h6>
+                        <h2 class="mb-0">{{ total_devices }}</h2>
+                    </div>
+                    <i class="fas fa-microchip fa-3x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'device-list' %}" class="small text-white stretched-link">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Total Readings</h6>
+                        <h2 class="mb-0">{{ total_readings }}</h2>
+                    </div>
+                    <i class="fas fa-tachometer-alt fa-3x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'device-list' %}" class="small text-white stretched-link">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Maintenance Events</h6>
+                        <h2 class="mb-0">{{ total_maintenance }}</h2>
+                    </div>
+                    <i class="fas fa-tools fa-3x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'device-list' %}" class="small text-dark stretched-link">View Details</a>
+                <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">High Risk Devices</h6>
+                        <h2 class="mb-0">{{ high_risk_devices|length }}</h2>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="#highRiskDevices" class="small text-white stretched-link">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="row">
+    <!-- Charts Column -->
+    <div class="col-lg-6">
+        <!-- Device Type Distribution Chart -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Device Type Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deviceTypeChart" height="300"></canvas>
+            </div>
+        </div>
+        
+        <!-- Maintenance by Type Chart -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Maintenance by Type</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="maintenanceTypeChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tables Column -->
+    <div class="col-lg-6">
+        <!-- High Risk Devices -->
+        <div class="card mb-4" id="highRiskDevices">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">High Risk Devices</h5>
+                <a href="{% url 'predict' %}" class="btn btn-sm btn-light">
+                    <i class="fas fa-chart-line me-1"></i>New Prediction
+                </a>
+            </div>
+            <div class="card-body">
+                {% if high_risk_devices %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Prediction Date</th>
+                                    <th>Probability</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in high_risk_devices %}
+                                <tr>
+                                    <td>{{ prediction.device.device_id }}</td>
+                                    <td>{{ prediction.prediction_date|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger" 
+                                                 role="progressbar" 
+                                                 style="width: {{ prediction.failure_probability|floatformat:2|multiply:100 }}%;" 
+                                                 aria-valuenow="{{ prediction.failure_probability|multiply:100 }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ prediction.failure_probability|floatformat:2 }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'results' prediction.id %}" class="btn btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'maintenance-create' prediction.device.device_id %}" class="btn btn-warning">
+                                                <i class="fas fa-tools"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>No high-risk devices detected at this time.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Maintenance Events -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Recent Maintenance</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_maintenance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in recent_maintenance %}
+                                <tr>
+                                    <td>{{ event.device.device_id }}</td>
+                                    <td>{{ event.event_date|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        {% if event.event_type == 'scheduled' %}
+                                            <span class="badge bg-info">Scheduled</span>
+                                        {% elif event.event_type == 'predictive' %}
+                                            <span class="badge bg-success">Predictive</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failure</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ event.cost|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No maintenance events recorded yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Device Readings -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Device Readings</h5>
+        <a href="{% url 'device-list' %}" class="btn btn-sm btn-light">
+            <i class="fas fa-plus me-1"></i>Add Reading
+        </a>
+    </div>
+    <div class="card-body">
+        {% if recent_readings %}
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th>Timestamp</th>
+                            <th>Metric 1</th>
+                            <th>Metric 2</th>
+                            <th>Metric 3</th>
+                            <th>Metric 4</th>
+                            <th>Metric 5</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reading in recent_readings %}
+                        <tr>
+                            <td>{{ reading.device.device_id }}</td>
+                            <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                            <td>{{ reading.metric1|floatformat:2 }}</td>
+                            <td>{{ reading.metric2|floatformat:2 }}</td>
+                            <td>{{ reading.metric3|floatformat:2 }}</td>
+                            <td>{{ reading.metric4|floatformat:2 }}</td>
+                            <td>{{ reading.metric5|floatformat:2 }}</td>
+                            <td>
+                                <a href="{% url 'device-detail' reading.device.device_id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No device readings available yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'device-create' %}" class="btn btn-outline-primary w-100 p-3">
+                    <i class="fas fa-plus fa-2x mb-2"></i>
+                    <br>Add New Device
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'device-list' %}" class="btn btn-outline-success w-100 p-3">
+                    <i class="fas fa-microchip fa-2x mb-2"></i>
+                    <br>Manage Devices
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'predict' %}" class="btn btn-outline-info w-100 p-3">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <br>Make Prediction
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary w-100 p-3">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                    <br>About System
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Charts
+    document.addEventListener('DOMContentLoaded', function() {
+        // Device Type Distribution Chart
+        const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
+        const deviceTypeChart = new Chart(deviceTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ device_type_labels|safe }},
+                datasets: [{
+                    data: {{ device_type_data|safe }},
+                    backgroundColor: [
+                        '#0d6efd',
+                        '#198754',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Maintenance by Type Chart
+        const maintenanceTypeCtx = document.getElementById('maintenanceTypeChart').getContext('2d');
+        const maintenanceTypeChart = new Chart(maintenanceTypeCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ maintenance_labels|safe }},
+                datasets: [{
+                    label: 'Maintenance Events',
+                    data: {{ maintenance_data|safe }},
+                    backgroundColor: [
+                        '#0dcaf0',
+                        '#198754',
+                        '#dc3545'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

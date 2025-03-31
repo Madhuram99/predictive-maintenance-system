@@ -1,0 +1,27 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+media
+
+# Virtual environment
+venv/
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# ML models
+*.pkl
+*.joblib
+
+# Database
+*.db
+
+# OS
+.DS_Store
+Thumbs.db

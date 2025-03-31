@@ -1,0 +1,69 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Device List</h2>
+    <a href="{% url 'device-create' %}" class="btn btn-primary">Add New Device</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Type</th>
+                        <th>Installation Date</th>
+                        <th>Location</th>
+                        <th>Last Reading</th>
+                        <th>Health Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for device in devices %}
+                    <tr>
+                        <td>{{ device.device_id }}</td>
+                        <td>{{ device.device_type }}</td>
+                        <td>{{ device.installation_date }}</td>
+                        <td>{{ device.location }}</td>
+                        <td>
+                            {% if device.readings.first %}
+                                {{ device.readings.first.timestamp|date:"Y-m-d H:i" }}
+                            {% else %}
+                                No readings
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% with prediction=device.predictions.first %}
+                                {% if prediction %}
+                                    <div class="progress">
+                                        <div class="progress-bar 
+                                            {% if prediction.failure_probability > 0.7 %}bg-danger
+                                            {% elif prediction.failure_probability > 0.4 %}bg-warning
+                                            {% else %}bg-success{% endif %}" 
+                                            role="progressbar" 
+                                            style="width: {{ prediction.failure_probability|floatformat:2 }}%"
+                                            aria-valuenow="{{ prediction.failure_probability|floatformat:2 }}" 
+                                            aria-valuemin="0" 
+                                            aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span class="badge bg-secondary">No prediction</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <a href="{% url 'device-detail' device.device_id %}" class="btn btn-sm btn-info">View</a>
+                            <a href="{% url 'predict' %}?device={{ device.device_id }}" class="btn btn-sm btn-warning">Predict</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Device Management</h1>
+    <a href="{% url 'device-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add New Device
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Registered Devices</h5>
+    </div>
+    <div class="card-body">
+        {% if device_list %}
+            <div class="table-responsive">
+                <table class="table table-striped datatable">
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Type</th>
+                            <th>Installation Date</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for device in device_list %}
+                        <tr>
+                            <td><a href="{% url 'device-detail' device.device_id %}">{{ device.device_id }}</a></td>
+                            <td>{{ device.device_type }}</td>
+                            <td>{{ device.installation_date }}</td>
+                            <td>{{ device.location }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'device-detail' device.device_id %}" class="btn btn-sm btn-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'device-update' device.device_id %}" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'device-delete' device.device_id %}" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No devices have been registered yet.
+            </div>
+            <a href="{% url 'device-create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Your First Device
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'device-create' %}" class="btn btn-outline-primary w-100 p-3">
+                            <i class="fas fa-plus fa-2x mb-2"></i>
+                            <br>Add New Device
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'predict' %}" class="btn btn-outline-success w-100 p-3">
+                            <i class="fas fa-chart-line fa-2x mb-2"></i>
+                            <br>Make Prediction
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-info w-100 p-3">
+                            <i class="fas fa-tachometer-alt fa-2x mb-2"></i>
+                            <br>View Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

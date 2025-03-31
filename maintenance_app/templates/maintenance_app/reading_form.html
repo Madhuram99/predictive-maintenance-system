@@ -1,0 +1,168 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if device %}
+                        Add New Reading for {{ device.device_id }}
+                    {% else %}
+                        Add New Device Reading
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if not device %}
+                    <div class="mb-3">
+                        <label for="{{ form.device.id_for_label }}" class="form-label">Device</label>
+                        {{ form.device }}
+                        {% if form.device.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.device.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                        {{ form.device }}
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric1.id_for_label }}" class="form-label">Metric 1</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric1.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric1.id_for_label }}" 
+                                   name="{{ form.metric1.html_name }}" 
+                                   value="{{ form.metric1.value|default:'' }}">
+                            {% if form.metric1.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric1.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric2.id_for_label }}" class="form-label">Metric 2</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric2.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric2.id_for_label }}" 
+                                   name="{{ form.metric2.html_name }}" 
+                                   value="{{ form.metric2.value|default:'' }}">
+                            {% if form.metric2.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric2.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric3.id_for_label }}" class="form-label">Metric 3</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric3.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric3.id_for_label }}" 
+                                   name="{{ form.metric3.html_name }}" 
+                                   value="{{ form.metric3.value|default:'' }}">
+                            {% if form.metric3.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric3.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric4.id_for_label }}" class="form-label">Metric 4</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric4.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric4.id_for_label }}" 
+                                   name="{{ form.metric4.html_name }}" 
+                                   value="{{ form.metric4.value|default:'' }}">
+                            {% if form.metric4.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric4.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric5.id_for_label }}" class="form-label">Metric 5</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric5.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric5.id_for_label }}" 
+                                   name="{{ form.metric5.html_name }}" 
+                                   value="{{ form.metric5.value|default:'' }}">
+                            {% if form.metric5.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric5.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric6.id_for_label }}" class="form-label">Metric 6</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric6.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric6.id_for_label }}" 
+                                   name="{{ form.metric6.html_name }}" 
+                                   value="{{ form.metric6.value|default:'' }}">
+                            {% if form.metric6.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric6.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric7.id_for_label }}" class="form-label">Metric 7</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric7.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric7.id_for_label }}" 
+                                   name="{{ form.metric7.html_name }}" 
+                                   value="{{ form.metric7.value|default:'' }}">
+                            {% if form.metric7.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric7.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric8.id_for_label }}" class="form-label">Metric 8</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric8.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric8.id_for_label }}" 
+                                   name="{{ form.metric8.html_name }}" 
+                                   value="{{ form.metric8.value|default:'' }}">
+                            {% if form.metric8.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric8.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.metric9.id_for_label }}" class="form-label">Metric 9</label>
+                            <input type="number" step="0.01" class="form-control {% if form.metric9.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.metric9.id_for_label }}" 
+                                   name="{{ form.metric9.html_name }}" 
+                                   value="{{ form.metric9.value|default:'' }}">
+                            {% if form.metric9.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.metric9.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>After saving, the system will automatically generate a prediction based on this reading.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        {% if device %}
+                            <a href="{% url 'device-detail' device.device_id %}" class="btn btn-secondary">Cancel</a>
+                        {% else %}
+                            <a href="{% url 'device-list' %}" class="btn btn-secondary">Cancel</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Save Reading</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'maintenance_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header {% if result.failure_predicted %}bg-danger{% else %}bg-success{% endif %} text-white">
+                <h4 class="mb-0">Prediction Results</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Device Information</h5>
+                        <p><strong>ID:</strong> {{ device.device_id }}</p>
+                        <p><strong>Type:</strong> {{ device.device_type }}</p>
+                        <p><strong>Location:</strong> {{ device.location }}</p>
+                        <p><strong>Last Reading:</strong> {{ device.readings.first.timestamp|date:"Y-m-d H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Prediction Details</h5>
+                        <p><strong>Status:</strong> 
+                            {% if result.failure_predicted %}
+                                <span class="badge bg-danger">Failure Predicted</span>
+                            {% else %}
+                                <span class="badge bg-success">Normal Operation</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Confidence:</strong> 
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar 
+                                    {% if result.failure_probability > 0.7 %}bg-danger
+                                    {% elif result.failure_probability > 0.4 %}bg-warning
+                                    {% else %}bg-success{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ result.failure_probability|floatformat:2 }}%"
+                                    aria-valuenow="{{ result.failure_probability|floatformat:2 }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    {{ result.failure_probability|floatformat:2 }}%
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-{% if result.failure_probability > 0.7 %}danger
+                                        {% elif result.failure_probability > 0.4 %}warning
+                                        {% else %}success{% endif %}">
+                    <h5>Recommended Action</h5>
+                    <p>{{ result.recommended_action }}</p>
+                    {% if result.failure_probability > 0.7 %}
+                        <a href="{% url 'maintenance-create' %}?device={{ device.device_id }}" 
+                           class="btn btn-danger mt-2">
+                            Schedule Immediate Maintenance
+                        </a>
+                    {% elif result.failure_probability > 0.4 %}
+                        <a href="{% url 'maintenance-create' %}?device={{ device.device_id }}" 
+                           class="btn btn-warning mt-2">
+                            Schedule Preventive Maintenance
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'predict' %}" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Make Another Prediction
+                    </a>
+                    <a href="{% url 'device-detail' device.device_id %}" class="btn btn-info">
+                        <i class="fas fa-info-circle"></i> View Device Details
+                    </a>
+                    <a href="{% url 'index' %}" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Return to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
